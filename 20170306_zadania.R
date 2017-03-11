@@ -88,3 +88,4 @@ korelacja<-cor(zwroty,method = "pearson")
 
 
 
+
