@@ -31,42 +31,44 @@ ggplot(apple_df,aes(x=date,y=close))+
 #pobranie przykladowego portfela zlozonego z kilku akcji
 library(sqldf)
 
-
 pobierz_portfel<-function(n){
   akcje1<-sample(akcje$Symbol,n)
+  print(akcje1)
   for(i in 1:n){
+    print(i)
     if(i==1){
-
-      ceny1<-getSymbols(akcje1[i],src = "yahoo",env = NULL,from="2015-01-01")
+      
+      ceny1<-getSymbols(sub("-","",akcje1[i]),src = "yahoo",env = NULL,from="2015-01-01")
       ceny1<-data.frame(ceny1)
       ceny1<-data.frame(daty=row.names(ceny1),ceny1)
       row.names(ceny1)<-1:nrow(ceny1)
       
       ceny1<-ceny1[,c(1,7)]
       ceny1$daty<-as.Date(ceny1$daty)
-      colnames(ceny1)<-c("date","close")
+      colnames(ceny1)<-c("date",akcje1[i])
       
       ceny<-ceny1
       
     } else{
       
-      ceny1<-getSymbols(akcje1[i],src = "yahoo",env = NULL,from="2015-01-01")
+      ceny1<-getSymbols(sub("-","",akcje1[i]),src = "yahoo" ,env = NULL,from="2015-01-01")
       ceny1<-data.frame(ceny1)
       ceny1<-data.frame(daty=row.names(ceny1),ceny1)
       row.names(ceny1)<-1:nrow(ceny1)
       
       ceny1<-ceny1[,c(1,7)]
       ceny1$daty<-as.Date(ceny1$daty)
-      colnames(ceny1)<-c("date","close")
+      colnames(ceny1)<-c("date",akcje1[i])
       
-      ceny<-sqldf("select a.*, b.close from ceny a inner join ceny1 b on a.date=b.date")
-          
+      ceny<-merge(ceny,ceny1,by.x="date", by.y="date")
+      #ceny<-sqldf("select a.*, b.close from ceny a inner join ceny1 b on a.date=b.date")
+      
     }
   }
   return(ceny)
 }
 
-portfel<-pobierz_portfel(2)
+portfel<-pobierz_portfel(13)
 
 #policzenie zwrotów cen (Delt), średniego zwrotu dla instrumentu i odchylenia standardowego
 zwroty<-apply(portfel[,c(2,3)],2,Delt)
@@ -80,12 +82,13 @@ odchylenie<-apply(zwroty,2,sd)
 #przeliczenie macierzy korelacji (cor, pearson)
 korelacja<-cor(zwroty,method = "pearson")
 
-
-
 #praca domowa
 #1. instalcja git-a, zalozenie konta na githubie
 #2. zastanowic sie nad mechanizmem pobieranie cen
+<<<<<<< HEAD
 
 
 
 
+=======
+>>>>>>> 950870d2a59ec3cfe72d2265b37180f5b2b56d97
