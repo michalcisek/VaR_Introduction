@@ -36,7 +36,54 @@ funkcja(c("AGORA", "KGHM", "CIGAMES","YOLO"),'2015-06-01','2017-03-20') -> fr
 db <- dbConnect(SQLite(), dbname="notowania_gpw_2020.sqlite")
 spolki <- dbGetQuery(db, "select distinct nazwa from notowania_2020")
 dbDisconnect(db)
-View(spolki)
+# View(spolki)
+
+
+
+# podsumowanie dotyczace spolki -------------------------------------------
+podsumowanie <- function(nazwy_akcji){
+  query <- paste("select nazwa, count(*) l_dni, min(data) min, max(data) max from notowania_2020
+                 where nazwa in('",paste(nazwy_akcji,collapse="' , '"),"')
+                 group by nazwa",sep="")
+  pods <- dbGetQuery(db, query)
+  return(pods)
+}
+
+podsumowanie("YOLO")
+podsumowanie(c("AGORA", "KGHM", "CIGAMES","YOLO"))
+
+
+# POROWNANIE CZASOW WYKONANIA FUNKCJI DLA ROZNYCH POMYSLOW !!!!
+# db <- dbConnect(SQLite(), dbname = "notowania_gpw_2020.sqlite")
+# 
+# podsumowanie <- function(nazwa_akcji){
+#   query <- paste("select count(*) l_dni, min(data) min, max(data) max from notowania_2020 where nazwa ='",nazwa_akcji,"'",sep="")
+#   pods <- dbGetQuery(db, query)
+#   pods<- data.frame(nazwa = nazwa_akcji, pods)
+#   return(pods)
+# }
+# 
+# do.call(rbind, lapply(unlist(spolki)[sample(552,10)], function(x) podsumowanie(x)))
+# 
+# 
+# podsumowanie1 <- function(nazwy_akcji){
+#   query <- paste("select nazwa, count(*) l_dni, min(data) min, max(data) max from notowania_2020 
+#                  where nazwa in('",paste(nazwy_akcji,collapse="' , '"),"')
+#                  group by nazwa",sep="")
+#   pods <- dbGetQuery(db, query)
+#   # pods<- data.frame(nazwa = nazwy_akcji, pods)
+#   return(pods)
+# }
+# 
+# 
+# microbenchmark::microbenchmark(
+#   do.call(rbind, lapply(unlist(spolki)[sample(552,10)], function(x) podsumowanie(x))),
+#   podsumowanie1(unlist(spolki)[sample(552,10)]),
+#   times = 20
+# )
+# 
+# dbDisconnect(db)
+
 
 
 # 1. zastanowic sie splitami
